@@ -1,6 +1,6 @@
 {
-  "name": "Kalkulator Harga Jual Sekar",
-  "short_name": "SekarCalc",
+  "name": "Kalkulator v5",
+  "short_name": "Sekarkalkulator",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#eef2f7",
