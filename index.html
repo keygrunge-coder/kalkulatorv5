@@ -1,21 +1,129 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kalkulator</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
-    </style>
+    untuk pwa <head>
+    <!-- Tambahkan baris ini -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <!-- Bagian lainnya... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Kalkulator Harga Jual</title>
+    <style>
+        body{font-family:Arial,sans-serif;background:#eef2f7;margin:0;padding:20px}
+        .wrap{max-width:700px;margin:auto}
+        .card{background:#fff;border-radius:14px;padding:18px;margin:15px 0;box-shadow:0 3px 10px rgba(0,0,0,.08)}
+        .hero{text-align:center;background:#2563eb;color:#fff}
+        .hero h1{margin:0;font-size:18px}
+        .price{font-size:40px;font-weight:bold}
+        label{display:block;margin-top:10px;font-size:13px;font-weight:bold}
+        input{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}
+        .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee}
+        .row:last-child{border:0}
+        details summary{cursor:pointer;font-weight:bold}
+    </style>
 </head>
 <body>
-    <div id="app">
-        <h1>Halo!</h1>
-        <p>Jika Anda bisa membaca ini, berarti HTML-nya berjalan.</p>
-    </div>
+    <div class="wrap">
+        <div class="card hero">
+            <h1>Harga Jual</h1>
+            <div id="hjHero" class="price">Rp0</div>
+        </div>
 
-    <script>
-        document.body.innerHTML = "<h1>Berhasil!</h1><p>Halaman tidak blank.</p>";
-    </script>
+        <div class="card">
+            <h3>Input</h3>
+            <label>HPP</label><input id="hpp" type="number">
+            <label>Target Margin (%)</label><input id="margin" type="number" value="20">
+            <label>Potongan Admin (%)</label><input id="admin" type="number" value="20">
+            <label>Biaya Lain</label><input id="lain" type="number" value="0">
+        </div>
+
+        <div class="card">
+            <div class="row"><span>Harga Jual</span><b id="hj">Rp0</b></div>
+            <div class="row"><span>Potongan Admin</span><b id="adm">Rp0</b></div>
+            <div class="row"><span>Dana Diterima</span><b id="dana">Rp0</b></div>
+            <div class="row"><span>Margin</span><b id="mar">Rp0</b></div>
+        </div>
+
+        <div class="card">
+            <details>
+                <summary>Pengaturan Iklan</summary>
+                <label>Target ROAS / ROI</label>
+                <input id="nilai" type="number" value="5">
+                <div class="row"><span>Biaya Iklan Maksimal</span><b id="ik">Rp0</b></div>
+                <div class="row"><span>Dana Setelah Iklan</span><b id="ds">Rp0</b></div>
+                <div class="row"><span>Untung Bersih</span><b id="ub">Rp0</b></div>
+            </details>
+        </div>
+
+        <div class="card">
+            <details open>
+                <summary>Target Harian</summary>
+                <label>Target Pengeluaran Harian (Rp)</label>
+                <input id="target" type="number">
+                <div class="row"><span>Target Paket</span><b id="paket">-</b></div>
+                <div class="row"><span>Target Omzet</span><b id="omzet">-</b></div>
+            </details>
+        </div>
+    </div>
+
+    <script>
+
+    
+        const $ = i => document.getElementById(i);
+        document.querySelectorAll("input").forEach(e => e.oninput = hitung);
+        
+        function rp(n) { return "Rp" + Math.round(n).toLocaleString("id-ID"); }
+        
+        function hitung() {
+            let h = +$('hpp').value || 0, m = +$('margin').value || 0, a = +$('admin').value || 0, l = +$('lain').value || 0;
+            
+            let marginRp = h * m / 100;
+            let danaTarget = h + marginRp + l;
+            let jual = (a >= 100) ? 0 : danaTarget / (1 - a / 100);
+            let adminRp = jual * a / 100;
+            let diterima = jual - adminRp;
+            
+            $('hjHero').textContent = rp(jual); 
+            $('hj').textContent = rp(jual);
+            $('adm').textContent = rp(adminRp) + " (" + a + "%)";
+            $('dana').textContent = rp(diterima) + " (" + (100 - a) + "%)";
+            $('mar').textContent = rp(marginRp) + " (" + m + "%)";
+            
+            let n = +$('nilai').value || 0, iklan = 0;
+            if (n > 0) iklan = jual / n;
+            $('ik').textContent = rp(iklan);
+            
+            let setelah = diterima - iklan;
+            let untung = setelah - h - l;
+            
+            $('ds').textContent = rp(setelah);
+            $('ub').textContent = rp(untung) + " (" + (h ? ((untung / h) * 100).toFixed(1) : 0) + "%)";
+            
+            let t = +$('target').value || 0;
+            let jumlahPaket = (t > 0 && untung > 0) ? Math.ceil(t / untung) : 0;
+            
+            $('paket').textContent = (jumlahPaket > 0) ? jumlahPaket + " Paket" : "-";
+            $('omzet').textContent = (jumlahPaket > 0) ? rp(jumlahPaket * jual) : "-";
+        }
+        hitung();
+
+        
+    // --- TAMBAHKAN INI UNTUK MENDAFTARKAN SERVICE WORKER ---
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+            navigator.serviceWorker.register("service-worker.js")
+                .then(reg => console.log("Service Worker terdaftar!", reg))
+                .catch(err => console.log("Gagal mendaftar:", err));
+        });
+    }
+    // ------------------------------------------------------
+
+    const $ = i => document.getElementById(i);
+    // ... (sisanya kode Anda tetap sama)
+    </script>
 </body>
 </html>
+ 
