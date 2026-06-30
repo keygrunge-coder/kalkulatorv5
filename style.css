@@ -1,0 +1,11 @@
+body { font-family: Arial, sans-serif; background: #eef2f7; margin: 0; padding: 20px; }
+.wrap { max-width: 700px; margin: auto; }
+.card { background: #fff; border-radius: 14px; padding: 18px; margin: 15px 0; box-shadow: 0 3px 10px rgba(0,0,0,.08); }
+.hero { text-align: center; background: #2563eb; color: #fff; }
+.hero h1 { margin: 0; font-size: 18px; }
+.price { font-size: 40px; font-weight: bold; }
+label { display: block; margin-top: 10px; font-size: 13px; font-weight: bold; }
+input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+.row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+.row:last-child { border: 0; }
+details summary { cursor: pointer; font-weight: bold; }
